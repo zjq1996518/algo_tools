@@ -2,7 +2,6 @@ import math
 import cv2
 import numpy as np
 import requests
-import torch
 from PIL import ImageFont, ImageDraw
 
 
@@ -239,6 +238,7 @@ def calc_iou(boxes1, boxes2):
 
     backend = np
     if not isinstance(boxes1, np.ndarray):
+        import torch
         backend = torch
 
     lu = backend.maximum(boxes1[..., :2], boxes2[..., :2])
