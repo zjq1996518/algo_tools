@@ -28,10 +28,10 @@ def reduce(queue, reduce_func, reduce_param):
     params = []
     while True:
         rst = queue.get()
-        params.append(rst)
         # 结束任务
         if isinstance(rst, str) and rst == 'EOF':
             break
+        params.append(rst)
     reduce_func(params, *reduce_param)
 
 
