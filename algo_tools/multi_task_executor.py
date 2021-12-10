@@ -24,25 +24,24 @@ def show_progress(total_len, share):
                 return
 
 
-def reduce(share_value, lock, queue, reduce_func):
+def reduce(queue, reduce_func, reduce_param):
+    params = []
     while True:
         rst = queue.get()
-
+        params.append(rst)
         # 结束任务
         if isinstance(rst, str) and rst == 'EOF':
-            return
-
-        reduce_func(*rst)
-        with lock:
-            share_value.value += 1
+            break
+    reduce_func(params, *reduce_param)
 
 
 class MultiTaskExecutor(object):
-    def __init__(self, target, pool_size=16, use_queue=False, reduce_func=None):
+    def __init__(self, target, pool_size=16, use_queue=False, reduce_func=None, reduce_param=None):
         self.target = target
         self.pool_size = pool_size
         self.use_queue = use_queue
         self.reduce_func = reduce_func
+        self.reduce_param = reduce_param
         self.queue = None
 
     def execute(self, tasks):
@@ -67,7 +66,7 @@ class MultiTaskExecutor(object):
         # reduce 子函数
         reduce_process = None
         if self.reduce_func is not None:
-            reduce_process = Process(target=reduce, args=(share_value, lock, self.queue, self.reduce_func))
+            reduce_process = Process(target=reduce, args=(self.queue, self.reduce_func, self.reduce_param))
             reduce_process.start()
 
         # 任务池分配任务
@@ -93,6 +92,5 @@ class MultiTaskExecutor(object):
         rst = self.target(*args)
         if self.use_queue:
             self.queue.put(rst)
-        if self.reduce_func is None:
-            with lock:
-                share_value.value += 1
+        with lock:
+            share_value.value += 1
