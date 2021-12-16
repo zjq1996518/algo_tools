@@ -15,5 +15,5 @@ setup(
     ],
     packages=find_packages(),
     include_package_data=True,
-    install_requires=['numpy', 'requests', 'opencv-python', 'tqdm']
+    install_requires=['numpy', 'requests', 'tqdm']
 )
