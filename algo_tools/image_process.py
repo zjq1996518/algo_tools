@@ -13,7 +13,13 @@ def download_img(url):
 
 
 def img_crop(img, rect):
-    return img[rect[1]: rect[3], rect[0]: rect[2], :]
+    s_h = max(0, rect[1])
+    e_h = min(img.shape[0], rect[3])
+
+    s_x = max(0, rect[0])
+    e_x = max(img.shape[1], rect[2])
+
+    return img[s_h: e_h, s_x: e_x, ...]
 
 
 def standard_resize(img, resize_width, resize_height, transform_info=False, pad_value=0, pad_style='center'):
