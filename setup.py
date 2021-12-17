@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="algo_tools",
-    version="0.0.17",
+    version="0.0.18",
     author="zjq",
     author_email="zjq@zjq2133318.com",
     description="best algo tools packages",
