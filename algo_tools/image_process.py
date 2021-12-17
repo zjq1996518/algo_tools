@@ -17,7 +17,7 @@ def img_crop(img, rect):
     e_h = min(img.shape[0], rect[3])
 
     s_x = max(0, rect[0])
-    e_x = max(img.shape[1], rect[2])
+    e_x = min(img.shape[1], rect[2])
 
     return img[s_h: e_h, s_x: e_x, ...]
 
