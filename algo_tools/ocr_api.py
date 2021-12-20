@@ -79,5 +79,5 @@ async def _request(session, url, data):
     async with session.post(url, data=data) as resp:
         rst = await resp.json()
         content = rst['results'][0]
-        content = content[0] if len(content) > 0 else ''
+        content = content[0] if len(content) > 0 else {'confidence': 0, 'text': '', 'text_region': []}
         return content
