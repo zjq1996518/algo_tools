@@ -78,4 +78,6 @@ async def _async_ocr_by_img(imgs, type):
 async def _request(session, url, data):
     async with session.post(url, data=data) as resp:
         rst = await resp.json()
-        return rst['results'][0][0]
+        content = rst['results'][0]
+        content = content[0] if len(content) > 0 else ''
+        return content
