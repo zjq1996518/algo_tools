@@ -36,13 +36,14 @@ def reduce(queue, reduce_func, reduce_param):
 
 
 class MultiTaskExecutor(object):
-    def __init__(self, target, pool_size=16, use_queue=False, reduce_func=None, reduce_param=None):
+    def __init__(self, target, pool_size=16, use_queue=False, reduce_func=None, reduce_param=None, queue_max_size=-1):
         self.target = target
         self.pool_size = pool_size
         self.use_queue = use_queue
         self.reduce_func = reduce_func
         self.reduce_param = reduce_param
         self.queue = None
+        self.queue_max_size = queue_max_size
 
     def execute(self, tasks):
         assert isinstance(tasks, list) or isinstance(tasks, int), 'tasks ValueError'
@@ -56,7 +57,7 @@ class MultiTaskExecutor(object):
         share_value = manager.Value(typecode=int, value=0)
 
         if self.use_queue:
-            self.queue = manager.Queue(maxsize=1000)
+            self.queue = manager.Queue(self.queue_max_size) if self.queue_max_size != -1 else manager.Queue()
 
         # 进度条子进程
         task_length = len(tasks) if isinstance(tasks, list) else tasks
