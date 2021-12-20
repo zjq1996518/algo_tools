@@ -46,8 +46,7 @@ def ocr_by_img(img, type='ocr-page'):
 
 
 def async_ocr_by_img(imgs, type):
-    loop = asyncio.get_event_loop()
-    return loop.run_until_complete(_async_ocr_by_img(imgs, type))
+    return asyncio.run(_async_ocr_by_img(imgs, type))
 
 
 async def _async_ocr_by_img(imgs, type):
