@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="algo_tools",
-    version="0.0.19",
+    version="0.0.20",
     author="zjq",
     author_email="zjq@zjq2133318.com",
     description="best algo tools packages",
@@ -15,5 +15,5 @@ setup(
     ],
     packages=find_packages(),
     include_package_data=True,
-    install_requires=['numpy', 'requests', 'tqdm']
+    install_requires=['numpy', 'requests', 'tqdm', 'aiohttp']
 )
