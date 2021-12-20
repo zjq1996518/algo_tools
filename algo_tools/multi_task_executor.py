@@ -32,7 +32,10 @@ def reduce(queue, reduce_func, reduce_param):
         if isinstance(rst, str) and rst == 'EOF':
             break
         params.append(rst)
-    reduce_func(params, *reduce_param)
+    if reduce_param is not None:
+        reduce_func(params, *reduce_param)
+    else:
+        reduce_func(params)
 
 
 class MultiTaskExecutor(object):
