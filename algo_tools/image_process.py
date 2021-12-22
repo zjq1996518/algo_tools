@@ -1,4 +1,6 @@
 import math
+import random
+
 import cv2
 import numpy as np
 import requests
@@ -30,7 +32,7 @@ def standard_resize(img, resize_width, resize_height, transform_info=False, pad_
     :param resize_width:
     :param transform_info: False 仅返回变换后的图片 True 返回图片缩放率和填充像素， ratio_w, ratio_h, pad_w, pad_h
     :param pad_value 填充像素值
-    :param pad_style 填充方式 center, right, left
+    :param pad_style 填充方式 center, right, left, random_w
     :return:
     """
 
@@ -52,6 +54,9 @@ def standard_resize(img, resize_width, resize_height, transform_info=False, pad_
         elif pad_style == 'right':
             s_h = 0
             s_w = 0
+        elif pad_style == 'random_w':
+            s_w = random.randint(0, pad_width)
+            s_h = math.ceil(pad_height / 2)
         else:
             s_h = pad_height
             s_w = pad_width
