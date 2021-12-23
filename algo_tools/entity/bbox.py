@@ -46,11 +46,14 @@ class Bbox(object):
         self.y3 = self._coord_rescaling(self.y3, shift_y, scale_y)
         self.y4 = self._coord_rescaling(self.y4, shift_y, scale_y)
 
+        return self
+
     def from_other_box(self, bbox):
         self.x1, self.y1 = bbox.x1, bbox.y1
         self.x2, self.y2 = bbox.x2, bbox.y2
         self.x3, self.y3 = bbox.x3, bbox.y3
         self.x4, self.y4 = bbox.x4, bbox.y4
+        return self
 
     @staticmethod
     def _coord_rescaling(coord, shift, scale):
