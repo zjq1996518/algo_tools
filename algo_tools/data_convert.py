@@ -7,8 +7,8 @@ from glob import glob
 import cv2
 
 
-def rect2coco(img, img_name, bboxes, labels=None):
-    height, width, _ = img.shape
+def rect2coco(img_shape, img_name, bboxes, labels=None):
+    height, width, _ = img_shape
     res = {
         'version': '4.5.7',
         'flags': {},
