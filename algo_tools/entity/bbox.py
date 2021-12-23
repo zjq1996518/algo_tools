@@ -10,14 +10,14 @@ class Bbox(object):
         if coord is None:
             coord = [0 for _ in range(8)]
 
-        self.x1 = coord[0]
-        self.y1 = coord[1]
-        self.x2 = coord[2]
-        self.y2 = coord[3]
-        self.x3 = coord[4]
-        self.y3 = coord[5]
-        self.x4 = coord[6]
-        self.y4 = coord[7]
+        self.x1 = float(coord[0])
+        self.y1 = float(coord[1])
+        self.x2 = float(coord[2])
+        self.y2 = float(coord[3])
+        self.x3 = float(coord[4])
+        self.y3 = float(coord[5])
+        self.x4 = float(coord[6])
+        self.y4 = float(coord[7])
 
         self.sub_bboxes = []
         self.box_type = box_type
