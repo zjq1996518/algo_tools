@@ -59,6 +59,15 @@ class Bbox(object):
 
         return self
 
+    def clip(self, width, height):
+        self.x1 = max(0, self.x1)
+        self.y1 = max(0, self.x1)
+        self.x4 = min(width, self.x4)
+        self.y4 = min(height, self.y4)
+        self.x2, self.y2 = self.x4, self.y1
+        self.x3, self.y3 = self.x1, self.y4
+        return self
+
     @staticmethod
     def _coord_rescaling(coord, shift, scale):
         coord = (coord + shift) * scale
