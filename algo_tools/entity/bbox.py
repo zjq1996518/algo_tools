@@ -28,6 +28,17 @@ class Bbox(object):
     def __getitem__(self, i):
         return self.sub_bboxes[i]
 
+    def __add__(self, other):
+        self.x1 = min(other.x1, self.x1)
+        self.x4 = max(other.x4, self.x4)
+        self.y1 = min(other.y1, self.y1)
+        self.y4 = max(other.y4, self.y4)
+        self.x2 = self.x4
+        self.y2 = self.y1
+        self.x3 = self.x1
+        self.y3 = self.y4
+        return self
+
     def coord_rescaling(self, shift_x=0, scale_x=1, shift_y=0, scale_y=1):
         """
         用于对box坐标进行偏移
