@@ -10,14 +10,14 @@ class Bbox(object):
         if coord is None:
             coord = [0 for _ in range(8)]
 
-        self.x1 = float(coord[0])
-        self.y1 = float(coord[1])
-        self.x2 = float(coord[2])
-        self.y2 = float(coord[3])
-        self.x3 = float(coord[4])
-        self.y3 = float(coord[5])
-        self.x4 = float(coord[6])
-        self.y4 = float(coord[7])
+        self.x1 = coord[0]
+        self.y1 = coord[1]
+        self.x2 = coord[2]
+        self.y2 = coord[3]
+        self.x3 = coord[4]
+        self.y3 = coord[5]
+        self.x4 = coord[6]
+        self.y4 = coord[7]
 
         self.sub_bboxes = []
         self.box_type = box_type
@@ -46,13 +46,6 @@ class Bbox(object):
         self.y3 = self._coord_rescaling(self.y3, shift_y, scale_y)
         self.y4 = self._coord_rescaling(self.y4, shift_y, scale_y)
 
-        return self
-
-    def from_other_box(self, bbox):
-        self.x1, self.y1 = bbox.x1, bbox.y1
-        self.x2, self.y2 = bbox.x2, bbox.y2
-        self.x3, self.y3 = bbox.x3, bbox.y3
-        self.x4, self.y4 = bbox.x4, bbox.y4
         return self
 
     @staticmethod
@@ -122,9 +115,16 @@ class Bbox(object):
             self.box_type = kwargs['box_type']
         return self
 
+    def from_other_box(self, bbox):
+        self.x1, self.y1 = float(bbox.x1), float(bbox.y1)
+        self.x2, self.y2 = float(bbox.x2), float(bbox.y2)
+        self.x3, self.y3 = float(bbox.x3), float(bbox.y3)
+        self.x4, self.y4 = float(bbox.x4), float(bbox.y4)
+        return self
+
     def from_database(self, data, *args, **kwargs):
-        self.x1, self.y1 = data['startX'], data['startY']
-        self.x4, self.y4 = data['endX'], data['endY']
+        self.x1, self.y1 = float(data['startX']), float(data['startY'])
+        self.x4, self.y4 = float(data['endX']), float(data['endY'])
         self.x2, self.y2 = self.x4, self.y1
         self.x3, self.y3 = self.x1, self.y4
         self.set_box_type(*args, **kwargs)
@@ -133,10 +133,10 @@ class Bbox(object):
 
     def from_coco(self, data, *args, **kwargs):
         points = data['points']
-        self.x1 = points[0][0]
-        self.x4 = points[1][0]
-        self.y1 = points[0][1]
-        self.y4 = points[1][1]
+        self.x1 = float(points[0][0])
+        self.x4 = float(points[1][0])
+        self.y1 = float(points[0][1])
+        self.y4 = float(points[1][1])
         self.x2, self.y2 = self.x4, self.y1
         self.x3, self.y3 = self.x1, self.y4
 
@@ -145,8 +145,8 @@ class Bbox(object):
         return self
 
     def from_relative(self, data, *args, **kwargs):
-        self.x1, self.y1 = data['left'], data['top']
-        self.x4, self.y4 = data['width'] + data['left'], data['height'] + data['top']
+        self.x1, self.y1 = float(data['left']), float(data['top'])
+        self.x4, self.y4 = float(data['width']) + float(data['left']), float(data['height']) + float(data['top'])
         self.x2, self.y2 = self.x4, self.y1
         self.x3, self.y3 = self.x1, self.y4
 
@@ -155,8 +155,8 @@ class Bbox(object):
         return self
 
     def from_coord(self, data, *args, **kwargs):
-        self.x1, self.y1 = data[0], data[1]
-        self.x4, self.y4 = data[2], data[3]
+        self.x1, self.y1 = float(data[0]), float(data[1])
+        self.x4, self.y4 = float(data[2]), float(data[3])
         self.x2, self.y2 = self.x4, self.y1
         self.x3, self.y3 = self.x1, self.y4
 
