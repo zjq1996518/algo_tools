@@ -31,7 +31,8 @@ def reduce(queue, reduce_func, reduce_param):
         # 结束任务
         if isinstance(rst, str) and rst == 'EOF':
             break
-        params.append(rst)
+        if rst is not None:
+            params.append(rst)
     if reduce_param is not None:
         reduce_func(params, *reduce_param)
     else:
