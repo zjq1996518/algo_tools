@@ -61,7 +61,7 @@ class Bbox(object):
 
     def clip(self, width, height):
         self.x1 = max(0, self.x1)
-        self.y1 = max(0, self.x1)
+        self.y1 = max(0, self.y1)
         self.x4 = min(width, self.x4)
         self.y4 = min(height, self.y4)
         self.x2, self.y2 = self.x4, self.y1
