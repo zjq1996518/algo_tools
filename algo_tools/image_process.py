@@ -242,7 +242,7 @@ def img_slice(img, slice_w, slice_h, boxes=None, allow_size=100, need_offset=Fal
 
 def calc_intersection(boxes1, boxes2):
     """
-
+    计算Boxes1 与 boxes2 交集面积与boxes1面积之比
     :param boxes1: shape [n, 4] => [[x_start, y_start, x_end, y_end], ...]
     :param boxes2:
     :return:
