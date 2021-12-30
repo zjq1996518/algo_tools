@@ -240,6 +240,39 @@ def img_slice(img, slice_w, slice_h, boxes=None, allow_size=100, need_offset=Fal
     return slice_images, border_images
 
 
+def calc_iou(boxes1, boxes2):
+    """
+
+    :param boxes1: shape [n, 4] => [[x_start, y_start, x_end, y_end], ...]
+    :param boxes2:
+    :return:
+    """
+
+    backend = np
+    if not isinstance(boxes1, np.ndarray):
+        import torch
+        backend = torch
+
+    lu = backend.maximum(boxes1[..., :2], boxes2[..., :2])
+    rd = backend.minimum(boxes1[..., 2:], boxes2[..., 2:])
+
+    # 计算机交集面积
+    zero = 0.0 if isinstance(boxes1, np.ndarray) else torch.tensor(0.0)
+    intersection = backend.maximum(zero, rd - lu)
+    inter_square = intersection[..., 0] * intersection[..., 1]
+
+    # 计算每个box的面积
+    square1 = (boxes1[..., 2] - boxes1[..., 0]) * (boxes1[..., 3] - boxes1[..., 1])
+    square2 = (boxes2[..., 2] - boxes2[..., 0]) * (boxes2[..., 3] - boxes2[..., 1])
+    # 计算并集面积
+    esp = 1e-10 if isinstance(boxes1, np.ndarray) else torch.tensor(1e-10)
+    union_square = backend.maximum(square1 + square2 - inter_square, esp)
+
+    # numpy 后面两个参数是分别表示最大值与最小值
+    return backend.clip(inter_square / union_square, 0.0, 1.0)
+
+
+
 def calc_intersection(boxes1, boxes2):
     """
     计算Boxes1 与 boxes2 交集面积与boxes1面积之比
@@ -262,10 +295,10 @@ def calc_intersection(boxes1, boxes2):
     inter_square = intersection[..., 0] * intersection[..., 1]
 
     # 计算每个box的面积
-    square1 = (boxes1[..., 2] - boxes1[..., 0]) * (boxes1[..., 3] - boxes1[..., 1])
+    square2 = (boxes2[..., 2] - boxes2[..., 0]) * (boxes2[..., 3] - boxes2[..., 1])
 
     # numpy 后面两个参数是分别表示最大值与最小值
-    return backend.clip(inter_square / square1, 0.0, 1.0)
+    return backend.clip(inter_square / square2, 0.0, 1.0)
 
 
 def img_extend_slice(img, slice_w, slice_h, margin_w=0, margin_h=0, need_offset=False):
