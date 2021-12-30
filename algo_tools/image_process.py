@@ -218,8 +218,9 @@ def img_slice(img, slice_w, slice_h, boxes=None, allow_size=100, need_offset=Fal
                 if border_img is not None:
                     border_residual_boxes = boxes if border_residual_boxes is None else border_residual_boxes
                     border_boxes, border_residual_boxes = assign_boxes(
-                        [w_border_start, h_border_start, w_border_end-1, h_border_end-1], border_residual_boxes)
-                    border_rst = [border_img, border_boxes, border_offset] if need_offset else [border_img, border_boxes]
+                        [w_border_start, h_border_start, w_border_end - 1, h_border_end - 1], border_residual_boxes)
+                    border_rst = [border_img, border_boxes, border_offset] if need_offset else [border_img,
+                                                                                                border_boxes]
                     border_images.append(border_rst)
             else:
                 slice_rst = [slice_img, slice_offset] if need_offset else slice_img
@@ -271,13 +272,65 @@ def calc_iou(boxes1, boxes2):
     return backend.clip(inter_square / union_square, 0.0, 1.0)
 
 
+def img_extend_slice(img, slice_w, slice_h, margin_w=0, margin_h=0, need_offset=False):
+    """
+    :param img: 原图
+    :param slice_w: 切片后每张图片的宽度
+    :param slice_h: 切片后每张图片的高度
+    :param boxes: 目标检测的盒子，如果不为None 则跟随图片一直进行切片分组
+    :param allow_size: 所允许的一张切片图最小尺度, 若当前切片宽度或者高度小于allow_size
+                        则该部分会被附加到上一张图，不作为一张单独的新图
+    :param need_offset 是否需要图片的offset信息
+    :param assign_rate box面积保留率，即当前box被裁剪后如果还有assign_rate面积存在，则保留
+    :return:
+    """
+
+    img_height, img_width = img.shape[:2]
+    assert slice_w < img_width, '切图宽度必须小于原图片宽度'
+    assert slice_h < img_height, '切图高度必须小于原图片高度'
+
+    slice_images = []
+
+    slice_w -= margin_w
+    slice_h -= margin_h
+
+    cols = math.ceil((img_width - margin_w) / slice_w)
+    rows = math.ceil((img_height - margin_h) / slice_h)
+
+    for col in range(cols):
+        slice_images.append([])
+        w_start = slice_w * col
+        # 如果是最后一片且图片不能整除，则通过调整w_start来倒切
+        if col == cols - 1 and img_width % slice_w != 0:
+            w_start = img_width - slice_w - margin_w
+        for row in range(rows):
+            # 同上
+            h_start = slice_h * row
+            if row == rows - 1 and img_height % slice_h != 0:
+                h_start = img_height - slice_h - margin_h
+            slice_img = img[h_start:h_start + slice_h + margin_h, w_start:w_start + slice_w + margin_w, ...]
+            slice_offset = (h_start, w_start)
+            if not need_offset:
+                slice_images[col].append(slice_img)
+            else:
+                slice_images[col].append((slice_img, slice_offset))
+    return slice_images
+
+
 if __name__ == '__main__':
     # 测试一下
     import json
-    origin_img = cv2.imread('/local/aitrain/zjq/table_text_detection/1school7871c1fc43b446ddb6fe6622ec18769b.jpg')
-    with open('/local/aitrain/zjq/table_text_detection/1school7871c1fc43b446ddb6fe6622ec18769b.json') as f:
-        boxes = json.load(f)
-    boxes = boxes['shapes']
-    boxes = [[box['points'][0][0], box['points'][0][1], box['points'][1][0], box['points'][1][1]] for box in boxes]
-    slice_images, border_images = img_slice(origin_img, slice_w=640, slice_h=640, boxes=boxes)
+
+    origin_img = cv2.imread(
+        '/local/aitrain/zjq/resource/detectors/debug-data/1school59eb623f567a469aafcb4c85e1dd4b82.JPG')
+    # with open('/local/aitrain/zjq/table_text_detection/1school7871c1fc43b446ddb6fe6622ec18769b.json') as f:
+    #     boxes = json.load(f)
+    # boxes = boxes['shapes']
+    # boxes = [[box['points'][0][0], box['points'][0][1], box['points'][1][0], box['points'][1][1]] for box in boxes]
+    origin_img = cv2.resize(origin_img, (origin_img.shape[1] // 2, origin_img.shape[0] // 2))
+    cv2.imwrite(f'/local/aitrain/zjq/resource/detectors/debug-data/slice-test/all.jpg', origin_img)
+    slice_images = img_extend_slice(origin_img, slice_w=896, slice_h=896, margin_w=200, margin_h=100)
+    for i, row in enumerate(slice_images):
+        for j, img in enumerate(row):
+            cv2.imwrite(f'/local/aitrain/zjq/resource/detectors/debug-data/slice-test/{i}-{j}.jpg', img)
     print()
