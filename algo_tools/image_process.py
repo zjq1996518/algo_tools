@@ -240,7 +240,7 @@ def img_slice(img, slice_w, slice_h, boxes=None, allow_size=100, need_offset=Fal
     return slice_images, border_images
 
 
-def calc_iou(boxes1, boxes2):
+def calc_intersection(boxes1, boxes2):
     """
 
     :param boxes1: shape [n, 4] => [[x_start, y_start, x_end, y_end], ...]
@@ -263,13 +263,9 @@ def calc_iou(boxes1, boxes2):
 
     # 计算每个box的面积
     square1 = (boxes1[..., 2] - boxes1[..., 0]) * (boxes1[..., 3] - boxes1[..., 1])
-    square2 = (boxes2[..., 2] - boxes2[..., 0]) * (boxes2[..., 3] - boxes2[..., 1])
-    # 计算并集面积
-    esp = 1e-10 if isinstance(boxes1, np.ndarray) else torch.tensor(1e-10)
-    union_square = backend.maximum(square1 + square2 - inter_square, esp)
 
     # numpy 后面两个参数是分别表示最大值与最小值
-    return backend.clip(inter_square / union_square, 0.0, 1.0)
+    return backend.clip(inter_square / square1, 0.0, 1.0)
 
 
 def img_extend_slice(img, slice_w, slice_h, margin_w=0, margin_h=0, need_offset=False):
