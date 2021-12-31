@@ -323,8 +323,8 @@ def img_extend_slice(img, slice_w, slice_h, margin_w=0, margin_h=0, need_offset=
     slice_w -= margin_w
     slice_h -= margin_h
 
-    cols = math.ceil((img_width - margin_w) / slice_w)
-    rows = math.ceil((img_height - margin_h) / slice_h)
+    cols = math.ceil((max(img_width - margin_w, 1)) / slice_w)
+    rows = math.ceil(max((img_height - margin_h), 1) / slice_h)
 
     for col in range(cols):
         slice_images.append([])
@@ -350,16 +350,17 @@ if __name__ == '__main__':
     # 测试一下
     import json
 
-    origin_img = cv2.imread(
-        '/local/aitrain/zjq/resource/detectors/debug-data/1school59eb623f567a469aafcb4c85e1dd4b82.JPG')
+    # origin_img = cv2.imread(
+    #     '/local/aitrain/zjq/resource/detectors/debug-data/1school59eb623f567a469aafcb4c85e1dd4b82.JPG')
     # with open('/local/aitrain/zjq/table_text_detection/1school7871c1fc43b446ddb6fe6622ec18769b.json') as f:
     #     boxes = json.load(f)
     # boxes = boxes['shapes']
     # boxes = [[box['points'][0][0], box['points'][0][1], box['points'][1][0], box['points'][1][1]] for box in boxes]
-    origin_img = cv2.resize(origin_img, (origin_img.shape[1] // 2, origin_img.shape[0] // 2))
-    cv2.imwrite(f'/local/aitrain/zjq/resource/detectors/debug-data/slice-test/all.jpg', origin_img)
+    # origin_img = cv2.resize(origin_img, (origin_img.shape[1] // 2, origin_img.shape[0] // 2))
+    # cv2.imwrite(f'/local/aitrain/zjq/resource/detectors/debug-data/slice-test/all.jpg', origin_img)
+    origin_img = np.random.rand(35, 30, 3)
     slice_images = img_extend_slice(origin_img, slice_w=896, slice_h=896, margin_w=200, margin_h=100)
-    for i, row in enumerate(slice_images):
-        for j, img in enumerate(row):
-            cv2.imwrite(f'/local/aitrain/zjq/resource/detectors/debug-data/slice-test/{i}-{j}.jpg', img)
+    # for i, row in enumerate(slice_images):
+    #     for j, img in enumerate(row):
+    #         cv2.imwrite(f'/local/aitrain/zjq/resource/detectors/debug-data/slice-test/{i}-{j}.jpg', img)
     print()
