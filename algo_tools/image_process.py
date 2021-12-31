@@ -315,8 +315,8 @@ def img_extend_slice(img, slice_w, slice_h, margin_w=0, margin_h=0, need_offset=
     """
 
     img_height, img_width = img.shape[:2]
-    assert slice_w < img_width, '切图宽度必须小于原图片宽度'
-    assert slice_h < img_height, '切图高度必须小于原图片高度'
+    # assert slice_w < img_width, '切图宽度必须小于原图片宽度'
+    # assert slice_h < img_height, '切图高度必须小于原图片高度'
 
     slice_images = []
 
