@@ -27,12 +27,11 @@ def show_progress(total_len, share):
 def reduce(queue, reduce_func, reduce_param):
     params = []
     while True:
-        rst = queue.get()
+        rsts = queue.get()
         # 结束任务
-        if isinstance(rst, str) and rst == 'EOF':
+        if isinstance(rsts, str) and rsts == 'EOF':
             break
-        if rst is not None:
-            params.append(rst)
+        params += rsts
     if reduce_param is not None:
         reduce_func(params, *reduce_param)
     else:
@@ -40,21 +39,18 @@ def reduce(queue, reduce_func, reduce_param):
 
 
 class MultiTaskExecutor(object):
-    def __init__(self, target, pool_size=16, use_queue=False, reduce_func=None, reduce_param=None, queue_max_size=-1):
+    def __init__(self, target, pool_size=16, reduce_func=None, reduce_param=None, queue_max_size=-1):
         self.target = target
         self.pool_size = pool_size
-        self.use_queue = use_queue
         self.reduce_func = reduce_func
         self.reduce_param = reduce_param
         self.queue = None
         self.queue_max_size = queue_max_size
+        self.use_queue = self.reduce_func is not None
 
     def execute(self, tasks):
-        assert isinstance(tasks, list) or isinstance(tasks, int), 'tasks ValueError'
-        assert isinstance(tasks, list) and len(tasks) > 0 or tasks > 0, '任务数量小于0'
-
-        if self.reduce_func is not None:
-            assert self.use_queue, '使用了reduce函数必须启用queue'
+        assert isinstance(tasks, list), 'tasks ValueError'
+        assert isinstance(tasks, list) and len(tasks) > 0, '任务数量小于0'
 
         manager = Manager()
         lock = manager.Lock()
@@ -76,12 +72,12 @@ class MultiTaskExecutor(object):
 
         # 任务池分配任务
         pool = Pool(self.pool_size)
+        batch_size = len(tasks) // self.pool_size
+
         if isinstance(tasks, list):
-            for task in tasks:
-                pool.apply_async(self._target_func, args=(share_value, lock, *task))
-        else:
-            for _ in range(tasks):
-                pool.apply_async(self._target_func, args=(share_value, lock))
+            for i in range(self.pool_size):
+                batch_tasks = tasks[i*batch_size:(i+1)*batch_size] if i != self.pool_size - 1 else tasks[i*batch_size:]
+                pool.apply_async(self._target_func, args=(batch_tasks, share_value, lock))
         pool.close()
         pool.join()
         # reduce 子函数
@@ -93,9 +89,13 @@ class MultiTaskExecutor(object):
         time.sleep(1)
         count_process.terminate()
 
-    def _target_func(self, share_value, lock, *args):
-        rst = self.target(*args)
-        if self.use_queue:
-            self.queue.put(rst)
-        with lock:
-            share_value.value += 1
+    def _target_func(self, tasks, share_value, lock):
+        rsts = []
+        for i, task in enumerate(tasks):
+            rst = self.target(*task)
+            rsts.append(rst)
+            if self.use_queue and ((i != 0 and i % 1000 == 0) or i == len(tasks) - 1) and len(rsts) > 0:
+                self.queue.put([rst for rst in rsts if rst is not None])
+                with lock:
+                    share_value.value += len(rsts)
+                rsts.clear()
