@@ -1,5 +1,6 @@
 import math
 import random
+from time import time
 
 import cv2
 import numpy as np
@@ -86,19 +87,35 @@ def standard_resize(img, resize_width, resize_height, transform_info=False, pad_
     return img
 
 
-def normalize(img):
+def normalize(img, mode='normal'):
+    """
+    mode : 如果为none 对三通道等于0的值不做任何处理
+    """
     mean = np.array([123.675, 116.28, 103.53])[np.newaxis, :]
     std = np.array([58.395, 57.12, 57.375])[np.newaxis, :]
 
-    img = (img - mean) / std
+    if mode == 'none':
+        condition = (img[:, :, 0] != 0) | (img[:, :, 1] != 0) | (img[:, :, 2] != 0)
+        img = (img - mean) / std
+        img = condition * img
+    else:
+        img = (img - mean) / std
     return img
 
 
-def recover_normalize(img):
+def recover_normalize(img, mode='normal'):
+    """
+    mode : 如果为none 对三通道等于0的值不做任何处理
+    """
     mean = np.array([123.675, 116.28, 103.53])[np.newaxis, :]
     std = np.array([58.395, 57.12, 57.375])[np.newaxis, :]
 
-    img = img * std + mean
+    if mode == 'none':
+        condition = (img[:, :, 0] != 0) | (img[:, :, 1] != 0) | (img[:, :, 2] != 0)
+        img = img * std + mean
+        img = condition * img
+    else:
+        img = img * std + mean
     return img
 
 
@@ -272,7 +289,6 @@ def calc_iou(boxes1, boxes2):
     return backend.clip(inter_square / union_square, 0.0, 1.0)
 
 
-
 def calc_intersection(boxes1, boxes2):
     """
     计算Boxes1 与 boxes2 交集面积与boxes1面积之比
@@ -364,3 +380,12 @@ if __name__ == '__main__':
     #     for j, img in enumerate(row):
     #         cv2.imwrite(f'/local/aitrain/zjq/resource/detectors/debug-data/slice-test/{i}-{j}.jpg', img)
     print()
+
+
+# if __name__ == '__main__':
+#     test_img = (np.random.randn(1344, 800, 3) * 255).astype(np.uint8)
+#     s = time()
+#     a = (test_img[:, :, 0] != 0) | (test_img[:, :, 1] != 0) | (test_img[:, :, 2] != 0)
+#     a = a[..., np.newaxis]
+#     test_img = a * test_img
+#     print(time() - s)
