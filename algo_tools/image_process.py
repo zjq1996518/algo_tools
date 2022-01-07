@@ -96,7 +96,7 @@ def normalize(img, mode='normal'):
 
     if mode == 'none':
         condition = (img[:, :, 0] != 0) | (img[:, :, 1] != 0) | (img[:, :, 2] != 0)
-        condition = condition[np.newaxis, :]
+        condition = condition[..., np.newaxis]
         img = (img - mean) / std
         img = condition * img
     else:
@@ -113,7 +113,7 @@ def recover_normalize(img, mode='normal'):
 
     if mode == 'none':
         condition = (img[:, :, 0] != 0) | (img[:, :, 1] != 0) | (img[:, :, 2] != 0)
-        condition = condition[np.newaxis, :]
+        condition = condition[..., np.newaxis]
         img = img * std + mean
         img = condition * img
     else:
