@@ -1,6 +1,5 @@
 import math
 import random
-from time import time
 
 import cv2
 import numpy as np
