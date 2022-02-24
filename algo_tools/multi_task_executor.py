@@ -94,8 +94,9 @@ class MultiTaskExecutor(object):
         for i, task in enumerate(tasks):
             rst = self.target(*task)
             rsts.append(rst)
-            if self.use_queue and ((i != 0 and i % 1000 == 0) or i == len(tasks) - 1) and len(rsts) > 0:
-                self.queue.put([rst for rst in rsts if rst is not None])
+            if ((i != 0 and i % 1000 == 0) or i == len(tasks) - 1) and len(rsts) > 0:
+                if self.use_queue:
+                    self.queue.put([rst for rst in rsts if rst is not None])
                 with lock:
                     share_value.value += len(rsts)
                 rsts.clear()

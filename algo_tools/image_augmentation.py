@@ -74,30 +74,33 @@ def hsv_argument(img):
     if np.random.randint(2):
         img[..., 1] *= random.uniform(0.5, 1.5)
 
-    # random hue
     if random.randint(0, 1):
         img[..., 0] += random.uniform(-18, 18)
         img[..., 0][img[..., 0] > 360] -= 360
         img[..., 0][img[..., 0] < 0] += 360
 
-    # convert color from HSV to BGR
     img = img.astype(np.uint8)
     img = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
 
     return img
 
 
-def scale_transform(img, boxes=None):
+def scale_transform(img, o2o=True, boxes=None):
     # 图片随机扩张、压缩
     """
     :param img:
-    :param boxes: [n, 4, 2]
+    :param boxes: [n, 4, 2] 维度说明 n: box数量 4: 左上角 右上角 左下角 右下角 2: (x, y)
+    :param o2o: 是否等比例缩放
     :return:
     """
-    ratio = np.random.uniform(0.5, 1.5)
-    img = cv2.resize(img, (int(ratio * img.shape[1]), int(ratio * img.shape[0])), interpolation=cv2.INTER_AREA)
+    height_ratio = np.random.uniform(0.5, 1.5)
+    width_ratio = np.random.uniform(0.5, 1.5)
+    if o2o:
+        width_ratio = height_ratio
+    img = cv2.resize(img, (int(width_ratio * img.shape[1]), int(height_ratio * img.shape[0])), interpolation=cv2.INTER_AREA)
     if boxes is not None:
-        boxes *= ratio
+        boxes[:, :, 0] *= width_ratio
+        boxes[:, :, 1] *= height_ratio
         return img, boxes
     return img
 
@@ -119,12 +122,3 @@ def patch_image(img, width_range=(0.05, 0.3), height_range=(0.05, 0.3)):
     # 填充
     img[y: y+block_height, x:x+block_width, ...] = block
     return img
-
-
-if __name__ == '__main__':
-    img = cv2.imread('/local/aitrain/zjq/debug/test1.png')
-    for _ in range(100):
-        test_img = img.copy()
-        test_img = patch_image(test_img)
-        cv2.imshow('test', test_img)
-        cv2.waitKey(0)
