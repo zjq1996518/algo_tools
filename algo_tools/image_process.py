@@ -152,7 +152,7 @@ def calc_iou(boxes1, boxes2):
     """
 
     :param boxes1: shape [n, 4] => [[x_start, y_start, x_end, y_end], ...]
-    :param boxes2:
+    :param boxes2: 同上
     :return:
     """
     backend = np
