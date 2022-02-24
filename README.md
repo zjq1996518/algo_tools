@@ -35,7 +35,7 @@ line 中实现了很多有用的操作，两条直线的合并，
 由于在实际工作中经常涉及到上百万数据的处理，所以设计了这样一个类
 ## 安装
 ```angular2html
-pip install git+
+pip install git+https://github.com/zjq1996518/algo_tools.git
 ```
 
 ## 例子
