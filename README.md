@@ -1,5 +1,6 @@
 # algorithm-tools
 图像处理常用工具库 把自己在工作中常用的算法、方法封装起来，以便于开发，包括：
+希望这个工具库能够提升一些开发效率，若是有想法或是问题，欢迎提issue
 + entity 实体类
     + Bbox Bounding Box
     + Line 线
