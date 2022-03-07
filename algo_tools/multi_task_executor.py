@@ -72,7 +72,7 @@ class MultiTaskExecutor(object):
 
         # 任务池分配任务
         pool = Pool(self.pool_size)
-        batch_size = len(tasks) // self.pool_size
+        batch_size = math.ceil(len(tasks) / self.pool_size)
 
         if isinstance(tasks, list):
             for i in range(self.pool_size):
